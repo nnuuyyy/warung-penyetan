@@ -1,5 +1,12 @@
 <?php
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
+$_ENV['APP_DEBUG'] = 'true';
+putenv('APP_DEBUG=true');
+
 // Prepare writable /tmp directory structure for Vercel Serverless environment
 $storageDirs = [
     '/tmp/storage/framework/views',
