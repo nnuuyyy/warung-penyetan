@@ -1,13 +1,10 @@
 <?php
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+use Illuminate\Http\Request;
 
-$_ENV['APP_DEBUG'] = 'true';
-putenv('APP_DEBUG=true');
+define('LARAVEL_START', microtime(true));
 
-// Prepare writable /tmp directory structure for Vercel Serverless environment
+// Setup writable /tmp storage paths for Vercel Serverless
 $storageDirs = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/sessions',
@@ -22,7 +19,6 @@ foreach ($storageDirs as $dir) {
     }
 }
 
-// Set environment variables for storage & views
 putenv('APP_STORAGE=/tmp/storage');
 putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 $_ENV['APP_STORAGE'] = '/tmp/storage';
@@ -30,5 +26,14 @@ $_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
 $_SERVER['APP_STORAGE'] = '/tmp/storage';
 $_SERVER['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
 
-// Require Composer Autoloader and Laravel
-require __DIR__ . '/../public/index.php';
+// Load Composer Autoloader
+require __DIR__ . '/../vendor/autoload.php';
+
+// Bootstrap Laravel Application
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+// Handle Request
+$request = Request::capture();
+$response = $app->handle($request);
+$response->send();
+$app->terminate($request, $response);
